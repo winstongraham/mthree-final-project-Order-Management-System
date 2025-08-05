@@ -73,21 +73,33 @@ def update_order(order_id):
 
     data = request.get_json()
 
-    # Update fields if provided in the request JSON
-    if 'instrument' in data:
-        order.instrument = data['instrument']
-    if 'quantity' in data:
-        order.quantity = int(data['quantity'])
+    # Update price and quantity
+
     if 'price' in data:
         order.price = float(data['price'])
-    if 'side' in data:
-        order.side = data['side']
-    if 'status' in data:
-        order.status = data['status']
+
+    if 'quantity' in data:
+        order.quantity = int(data['quantity'])
+
+    # # Update fields if provided in the request JSON
+    # if 'instrument' in data:
+    #     order.instrument = data['instrument']
+    # if 'side' in data:
+    #     order.side = data['side']
+    # if 'status' in data:
+    #     order.status = data['status']
 
     db.session.commit()
 
-    return jsonify(order.to_dict())
+    return jsonify({
+        'id': order.id,
+        'instrument': order.instrument,
+        'quantity': order.quantity,
+        "price": order.price,
+        "side": order.side,
+        "status": order.status,
+        "timestamp": order.timestamp.isoformat()
+    }), 200
 
 if __name__ == '__main__':
     # Create tables if they don't exist
