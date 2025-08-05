@@ -8,10 +8,12 @@ export default function Order({ onOrderCreated }) {
     const [side, setSide] = useState('buy'); // default side
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState('');
 
     const handleSumbit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccess('');
 
         // Basic frontend validation
         if (!instrument || !quantity || !price) {
@@ -30,12 +32,17 @@ export default function Order({ onOrderCreated }) {
             });
             setLoading(false);
             onOrderCreated(response.data) // Notify parent
+            setSuccess('Order created successfully!'); // Set success message
             // Clear form
             setInstrument('');
             setQuantity('');
             setPrice('');
             setSide('buy');
+
+            // Clear success message after 3 seconds
+            setTimeout(() => setSuccess(''), 3000);
         }   catch (err) {
+            console.error('Order submission error:', err.response || err.message || err);
             setLoading(false);
             setError('Failed to create order. Please try again.');
         }
@@ -87,6 +94,7 @@ export default function Order({ onOrderCreated }) {
             </div>
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
+            {success && <p style={{ color: 'green' }}>{success}</p>}
 
             <button type='submit' disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit Order'}

@@ -10,7 +10,7 @@ function App() {
 
   const handleOrderCreated = () => {
     // Toggle refresh flag to tell OrderList to reload
-    setRefreshFlag(!refeshFlag);
+    setRefreshFlag(!refreshFlag);
   };
 
   return (
