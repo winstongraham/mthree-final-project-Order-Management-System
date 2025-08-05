@@ -39,6 +39,15 @@ export default function OrderList({ refreshFlag }) {
     };
 
     const submitEdit = async () => {
+        const price = parseFloat(editPrice);
+        const quantity = parseInt(editQuantity);
+
+        if (isNaN(price) || price <= 0 || isNaN(quantity) || quantity <= 0) {
+        alert('Price must be > 0 and Quantity must be a whole number > 0.');
+        return;
+        }
+
+
         try {
             await api.put(`/orders/${editOrderId}`, {
                 price: editPrice,
@@ -79,11 +88,13 @@ export default function OrderList({ refreshFlag }) {
                                 <input
                                     type="number"
                                     step="0.01"
+                                    min='0.01'
                                     value={editPrice}
                                     onChange={e => setEditPrice(e.target.value)}
                                 />
                                 <input
                                     type="number"
+                                    min="1"
                                     value={editQuantity}
                                     onChange={e => setEditQuantity(e.target.value)}
                                 />
