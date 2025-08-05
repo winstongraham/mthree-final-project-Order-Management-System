@@ -23,16 +23,15 @@ export default function OrderList({ refreshFlag }) {
     if (error) return <p>{error}</p>;
 
     return (
-        <div>
-            <h2>Orders</h2>
-            <ul>
-                {orders.length === 0 && <li>No orders found.</li>}
-                {orders.map(order => (
-                    <li key={order.id}>
-                        {order.instrument} - {order.quantity} @ ${order.price} [{order.side}]
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+  <ul>
+    {orders
+      .slice(-5)  // takes last 5 items
+      .map(order => (
+        <li key={order.id}>
+          {order.instrument} - {order.quantity} @ ${order.price} [{order.side}]
+        </li>
+      ))}
+  </ul>
+);
+
 }
