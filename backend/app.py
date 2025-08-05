@@ -89,16 +89,6 @@ def update_order(order_id):
 
     return jsonify(order.to_dict())
 
-@app.route("/orders/<int:order_id>", methods=["DELETE"])
-def delete_order(order_id):
-    order = Order.query.get(order_id)
-    if not order:
-        return jsonify({"error": "Order not found"}), 404
-
-        db.session.delete(order)
-        db.session.commit()
-        return jsonify({"message": "Order deleted"}), 200
-
 if __name__ == '__main__':
     # Create tables if they don't exist
     with app.app_context():
