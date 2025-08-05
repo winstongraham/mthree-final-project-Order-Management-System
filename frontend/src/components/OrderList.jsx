@@ -79,43 +79,65 @@ export default function OrderList({ refreshFlag }) {
     return (
         <div>
             {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-            <ul>
-                {orders.slice(-5).map(order => (
-                    <li key={order.id}>
-                        {order.instrument} - 
-                        {editOrderId === order.id ? (
-                            <>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min='0.01'
-                                    value={editPrice}
-                                    onChange={e => setEditPrice(e.target.value)}
-                                />
-                                <input
-                                    type="number"
-                                    min="1"
-                                    value={editQuantity}
-                                    onChange={e => setEditQuantity(e.target.value)}
-                                />
-                                <button onClick={submitEdit}>Save</button>
-                                <button onClick={cancelEdit}>Cancel</button>
-                            </>
-                        ) : (
-                            <>
-                                {order.quantity} @ ${order.price} [{order.side}]
-                                <button onClick={() => startEdit(order)}>Edit</button>
-                            </>
-                        )}
-                        <button
-                            style={{ marginLeft: '10px', color: 'red' }}
-                            onClick={() => handleDelete(order.id)}
-                        >
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            <table border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+  <thead>
+    <tr>
+      <th>Instrument</th>
+      <th>Side</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {orders.slice(-5).map(order => (
+      <tr key={order.id}>
+        <td>{order.instrument}</td>
+        <td>{order.side}</td>
+        {editOrderId === order.id ? (
+          <>
+            <td>
+              <input
+                type="number"
+                min="1"
+                value={editQuantity}
+                onChange={e => setEditQuantity(e.target.value)}
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={editPrice}
+                onChange={e => setEditPrice(e.target.value)}
+              />
+            </td>
+            <td>
+              <button onClick={submitEdit}>Save</button>
+              <button onClick={cancelEdit} style={{ marginLeft: '5px' }}>Cancel</button>
+            </td>
+          </>
+        ) : (
+          <>
+            <td>{order.quantity}</td>
+            <td>${order.price}</td>
+            <td>
+              <button onClick={() => startEdit(order)}>Edit</button>
+              <button
+                onClick={() => handleDelete(order.id)}
+                style={{ color: 'red', marginLeft: '10px' }}
+              >
+                Delete
+              </button>
+            </td>
+          </>
+        )}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
         </div>
     );
 }
