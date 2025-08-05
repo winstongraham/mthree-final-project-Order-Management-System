@@ -3,18 +3,23 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import OrderList from './components/OrderList'
+import OrderForm from './components/OrderForm'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [refreshFlag, setRefreshFlag] = useState(false);
+
+  const handleOrderCreated = () => {
+    // Toggle refresh flag to tell OrderList to reload
+    setRefreshFlag(!refeshFlag);
+  };
 
   return (
-    <>
-      <div className="App">
+      <div className="App" style={{ padding: '20px' }}>
       <h1>Order Management System</h1>
-      <OrderList />
+      <OrderForm onOrderCreated={handleOrderCreated} />
+      <OrderList refreshFlag={refreshFlag} />
     </div>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;
