@@ -62,6 +62,7 @@ function OrderList({ orders, limit, refreshOrders }) {
       >
         <thead>
           <tr>
+            <th>ID</th>
             <th>Instrument</th>
             <th>Price</th>
             <th>Quantity</th>
@@ -72,6 +73,8 @@ function OrderList({ orders, limit, refreshOrders }) {
         <tbody>
           {(limit ? orders.slice(0, limit) : orders).map((order) => (
             <tr key={order.id}>
+              <td>#{order.id}</td>
+
               <td>{order.instrument}</td>
               <td>
                 {editOrderId === order.id ? (
