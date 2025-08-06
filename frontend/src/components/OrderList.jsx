@@ -40,15 +40,19 @@ function OrderList({ orders, limit, refreshOrders }) {
   };
 
   const handleDelete = async (orderId) => {
-    try {
-      await api.delete(`/orders/${orderId}`);
-      setSuccessMessage('Order deleted successfully!');
-      refreshOrders(); // Trigger refetch
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (err) {
-      console.error('Delete failed:', err);
-    }
-  };
+  const confirmDelete = window.confirm("Are you sure you want to delete this order?");
+  if (!confirmDelete) return;
+
+  try {
+    await api.delete(`/orders/${orderId}`);
+    setSuccessMessage('Order deleted successfully!');
+    refreshOrders(); // Trigger refetch
+    setTimeout(() => setSuccessMessage(''), 3000);
+  } catch (err) {
+    console.error('Delete failed:', err);
+  }
+};
+
 
   return (
     <div>
