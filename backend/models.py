@@ -9,7 +9,7 @@ class Order(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     side = db.Column(db.String, nullable=False)  # buy or sell
-    status = db.Column(db.String, default='open')
+    status = db.Column(db.String, default='pending')
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):

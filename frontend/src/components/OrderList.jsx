@@ -6,6 +6,7 @@ export default function OrderList({ orders = [], limit }) {
   const [editOrderId, setEditOrderId] = useState(null);
   const [editPrice, setEditPrice] = useState('');
   const [editQuantity, setEditQuantity] = useState('');
+  const [editStatus, setEditStatus] = useState('');  // NEW state for status
 
   // Apply limit if provided
   const displayedOrders = limit ? orders.slice(-limit) : orders;
@@ -14,12 +15,14 @@ export default function OrderList({ orders = [], limit }) {
     setEditOrderId(order.id);
     setEditPrice(order.price);
     setEditQuantity(order.quantity);
+    setEditStatus(order.status);  // set status when editing starts
   };
 
   const cancelEdit = () => {
     setEditOrderId(null);
     setEditPrice('');
     setEditQuantity('');
+    setEditStatus('');
   };
 
   const submitEdit = async () => {
@@ -35,11 +38,13 @@ export default function OrderList({ orders = [], limit }) {
       await api.put(`/orders/${editOrderId}`, {
         price,
         quantity,
+        status: editStatus,  // send status update as well
       });
       cancelEdit();
       setSuccessMessage('Order updated successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
+      console.error('Update failed:', err);
       alert('Failed to update order');
     }
   };
@@ -64,6 +69,7 @@ export default function OrderList({ orders = [], limit }) {
             <th>Side</th>
             <th>Quantity</th>
             <th>Price</th>
+            <th>Status</th> {/* Status column */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -92,6 +98,13 @@ export default function OrderList({ orders = [], limit }) {
                     />
                   </td>
                   <td>
+                    <select value={editStatus} onChange={e => setEditStatus(e.target.value)}>
+                      <option value="pending">Pending</option>
+                      <option value="filled">Filled</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                  <td>
                     <button onClick={submitEdit}>Save</button>
                     <button onClick={cancelEdit} style={{ marginLeft: '5px' }}>
                       Cancel
@@ -102,6 +115,7 @@ export default function OrderList({ orders = [], limit }) {
                 <>
                   <td>{order.quantity}</td>
                   <td>${order.price}</td>
+                  <td>{order.status}</td>
                   <td>
                     <button onClick={() => startEdit(order)}>Edit</button>
                     <button onClick={() => handleDelete(order.id)} style={{ color: 'red', marginLeft: '10px' }}>

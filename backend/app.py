@@ -81,6 +81,9 @@ def update_order(order_id):
     if 'quantity' in data:
         order.quantity = int(data['quantity'])
 
+    if 'status' in data:
+        order.status = data['status']
+
     # # Update fields if provided in the request JSON
     # if 'instrument' in data:
     #     order.instrument = data['instrument']
