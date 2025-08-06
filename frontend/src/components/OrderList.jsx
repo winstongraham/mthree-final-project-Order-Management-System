@@ -1,51 +1,41 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import api from '../api';
 
-export default function OrderList({ orders = [], limit }) {
-  const [successMessage, setSuccessMessage] = useState('');
+function OrderList({ orders, limit, refreshOrders }) {
   const [editOrderId, setEditOrderId] = useState(null);
-  const [editPrice, setEditPrice] = useState('');
-  const [editQuantity, setEditQuantity] = useState('');
-  const [editStatus, setEditStatus] = useState('');  // NEW state for status
+  const [editStatus, setEditStatus] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  // Apply limit if provided
-  const displayedOrders = limit ? orders.slice(-limit) : orders;
+  const [price, setPrice] = useState('');
+  const [quantity, setQuantity] = useState('');
 
   const startEdit = (order) => {
     setEditOrderId(order.id);
-    setEditPrice(order.price);
-    setEditQuantity(order.quantity);
-    setEditStatus(order.status);  // set status when editing starts
+    setEditStatus(order.status);
+    setPrice(order.price);
+    setQuantity(order.quantity);
   };
 
   const cancelEdit = () => {
     setEditOrderId(null);
-    setEditPrice('');
-    setEditQuantity('');
     setEditStatus('');
+    setPrice('');
+    setQuantity('');
   };
 
   const submitEdit = async () => {
-    const price = parseFloat(editPrice);
-    const quantity = parseInt(editQuantity);
-
-    if (isNaN(price) || price <= 0 || isNaN(quantity) || quantity <= 0) {
-      alert('Price must be > 0 and Quantity must be a whole number > 0.');
-      return;
-    }
-
     try {
       await api.put(`/orders/${editOrderId}`, {
         price,
         quantity,
-        status: editStatus,  // send status update as well
+        status: editStatus,
       });
       cancelEdit();
       setSuccessMessage('Order updated successfully!');
+      refreshOrders(); // Trigger refetch
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Update failed:', err);
-      alert('Failed to update order');
     }
   };
 
@@ -53,77 +43,91 @@ export default function OrderList({ orders = [], limit }) {
     try {
       await api.delete(`/orders/${orderId}`);
       setSuccessMessage('Order deleted successfully!');
+      refreshOrders(); // Trigger refetch
       setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error) {
-      console.error('Failed to delete order:', error);
+    } catch (err) {
+      console.error('Delete failed:', err);
     }
   };
 
   return (
     <div>
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-      <table border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+      {successMessage && (
+        <p style={{ color: 'green', marginBottom: '10px' }}>{successMessage}</p>
+      )}
+      <table
+        border="1"
+        cellPadding="8"
+        style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}
+      >
         <thead>
           <tr>
             <th>Instrument</th>
-            <th>Side</th>
-            <th>Quantity</th>
             <th>Price</th>
-            <th>Status</th> {/* Status column */}
-            <th>Actions</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th colSpan="2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {displayedOrders.map(order => (
+          {(limit ? orders.slice(0, limit) : orders).map((order) => (
             <tr key={order.id}>
               <td>{order.instrument}</td>
-              <td>{order.side}</td>
-              {editOrderId === order.id ? (
-                <>
-                  <td>
-                    <input
-                      type="number"
-                      min="1"
-                      value={editQuantity}
-                      onChange={e => setEditQuantity(e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      value={editPrice}
-                      onChange={e => setEditPrice(e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <select value={editStatus} onChange={e => setEditStatus(e.target.value)}>
-                      <option value="pending">Pending</option>
-                      <option value="filled">Filled</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </td>
-                  <td>
+              <td>
+                {editOrderId === order.id ? (
+                  <input
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    type="number"
+                    step="0.01"
+                  />
+                ) : (
+                  order.price
+                )}
+              </td>
+              <td>
+                {editOrderId === order.id ? (
+                  <input
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    type="number"
+                  />
+                ) : (
+                  order.quantity
+                )}
+              </td>
+              <td>
+                {editOrderId === order.id ? (
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                  >
+                    <option value="open">Open</option>
+                    <option value="filled">Filled</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                ) : (
+                  order.status
+                )}
+              </td>
+              <td>
+                {editOrderId === order.id ? (
+                  <>
                     <button onClick={submitEdit}>Save</button>
-                    <button onClick={cancelEdit} style={{ marginLeft: '5px' }}>
-                      Cancel
-                    </button>
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td>{order.quantity}</td>
-                  <td>${order.price}</td>
-                  <td>{order.status}</td>
-                  <td>
+                    <button onClick={cancelEdit}>Cancel</button>
+                  </>
+                ) : (
+                  <>
                     <button onClick={() => startEdit(order)}>Edit</button>
-                    <button onClick={() => handleDelete(order.id)} style={{ color: 'red', marginLeft: '10px' }}>
-                      Delete
+                    <button onClick={() => handleDelete(order.id)}
+                     style={{ color: 'red', marginLeft: '10px' }}
+                    >
+                        Delete
                     </button>
-                  </td>
-                </>
-              )}
+                    
+                  </>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -131,3 +135,5 @@ export default function OrderList({ orders = [], limit }) {
     </div>
   );
 }
+
+export default OrderList;

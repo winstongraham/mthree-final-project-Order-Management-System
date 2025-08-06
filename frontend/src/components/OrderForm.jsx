@@ -6,6 +6,7 @@ export default function Order({ onOrderCreated }) {
     const [quantity, setQuantity] = useState('');
     const [price, setPrice] = useState('');
     const [side, setSide] = useState('buy'); // default side
+    const [status, setStatus] = useState('open'); // default status
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
@@ -83,6 +84,15 @@ export default function Order({ onOrderCreated }) {
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder='e.g. 150.00'
                 />
+            </div>
+
+             <div>
+                <label>Status: </label>
+                <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value='open'>open</option>
+                    <option value='filled'>filled</option>
+                    <option value='cancelled'>cancelled</option>
+                </select>
             </div>
 
             <div>

@@ -5,27 +5,29 @@ import OrderSearch from './components/OrderSearch';
 import api from './api';
 
 function App() {
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const [allOrders, setAllOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [viewAll, setViewAll] = useState(false);
 
+  // Fetch all orders from backend and update states
+  const refreshOrders = async () => {
+    try {
+      const response = await api.get('/orders');
+      setAllOrders(response.data);
+      setFilteredOrders(response.data);
+    } catch {
+      alert('Failed to fetch orders');
+    }
+  };
+
+  // On mount, fetch orders initially
   useEffect(() => {
-    const fetchAllOrders = async () => {
-      try {
-        const response = await api.get('/orders');
-        setAllOrders(response.data);
-        setFilteredOrders(response.data);
-      } catch {
-        alert('Failed to fetch all orders');
-      }
-    };
+    refreshOrders();
+  }, []);
 
-    fetchAllOrders();
-  }, [refreshFlag]);
-
+  // When order created, refresh orders
   const handleOrderCreated = () => {
-    setRefreshFlag(!refreshFlag);
+    refreshOrders();
   };
 
   return (
@@ -35,7 +37,7 @@ function App() {
       {!viewAll ? (
         <>
           <OrderForm onOrderCreated={handleOrderCreated} />
-          <OrderList orders={filteredOrders} limit={5} />
+          <OrderList orders={filteredOrders} limit={5} refreshOrders={refreshOrders} />
           <button onClick={() => setViewAll(true)} style={{ marginTop: '20px' }}>
             View All Orders
           </button>
@@ -50,7 +52,7 @@ function App() {
           <button onClick={() => setViewAll(false)} style={{ marginBottom: '10px' }}>
             Back to Home
           </button>
-          <OrderList orders={filteredOrders} />
+          <OrderList orders={filteredOrders} refreshOrders={refreshOrders} />
         </>
       )}
     </div>
@@ -58,16 +60,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-{/* <div
-  className="App"
-  style={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px',
-  }}
-> */}
