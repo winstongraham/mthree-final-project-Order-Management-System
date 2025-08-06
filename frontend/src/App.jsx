@@ -1,31 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OrderForm from './components/OrderForm';
 import OrderList from './components/OrderList';
+import OrderSearch from './components/OrderSearch';
+import api from './api';
 
 function App() {
   const [refreshFlag, setRefreshFlag] = useState(false);
+  const [allOrders, setAllOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [viewAll, setViewAll] = useState(false);
+
+  useEffect(() => {
+    const fetchAllOrders = async () => {
+      try {
+        const response = await api.get('/orders');
+        setAllOrders(response.data);
+        setFilteredOrders(response.data);
+      } catch {
+        alert('Failed to fetch all orders');
+      }
+    };
+
+    fetchAllOrders();
+  }, [refreshFlag]);
 
   const handleOrderCreated = () => {
     setRefreshFlag(!refreshFlag);
   };
 
   return (
-    <div className="App" style={{ padding: '20px' }}>
+    <div className="App" style={{ padding: '20px', maxWidth: '900px', margin: 'auto' }}>
       <h1>Order Management System</h1>
 
       {!viewAll ? (
         <>
           <OrderForm onOrderCreated={handleOrderCreated} />
-          <OrderList refreshFlag={refreshFlag} limit={5} />
+          <OrderList orders={filteredOrders} limit={5} />
           <button onClick={() => setViewAll(true)} style={{ marginTop: '20px' }}>
             View All Orders
           </button>
         </>
       ) : (
         <>
-          <button onClick={() => setViewAll(false)}>Back to Home</button>
-          <OrderList refreshFlag={refreshFlag} /> {/* No limit: show all */}
+          <OrderSearch
+            allOrders={allOrders}
+            setAllOrders={setAllOrders}
+            setOrders={setFilteredOrders}
+          />
+          <button onClick={() => setViewAll(false)} style={{ marginBottom: '10px' }}>
+            Back to Home
+          </button>
+          <OrderList orders={filteredOrders} />
         </>
       )}
     </div>
@@ -33,6 +58,9 @@ function App() {
 }
 
 export default App;
+
+
+
 
 {/* <div
   className="App"

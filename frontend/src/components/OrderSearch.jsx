@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 
-export default function OrderSearch({ setOrders, allOrders, setAllOrders }) {
+export default function OrderSearch({ setOrders, allOrders }) {
   const [searchId, setSearchId] = useState('');
 
-  const fetchAllOrders = async () => {
-    try {
-      const res = await api.get('/orders');
-      setAllOrders(res.data);
-      setOrders(res.data); // display all orders
-    } catch {
-      alert('Failed to fetch all orders');
-    }
+  const fetchAllOrders = () => {
+    setOrders(allOrders);
   };
 
   const filterOrderById = () => {
-    if (!searchId) return;
+    if (!searchId) {
+      alert('Please enter an order ID to search.');
+      return;
+    }
 
-    const filtered = allOrders.filter(order => order.id.toString() === searchId);
+    const filtered = allOrders.filter(order => order.id.toString() === searchId.trim());
     if (filtered.length > 0) {
       setOrders(filtered);
     } else {
@@ -25,7 +22,7 @@ export default function OrderSearch({ setOrders, allOrders, setAllOrders }) {
   };
 
   return (
-    <div className="flex gap-2 items-center mb-4">
+    <div style={{ marginBottom: '10px', display: 'flex', gap: '10px', alignItems: 'center' }}>
       <button onClick={fetchAllOrders}>View All Orders</button>
       <input
         type="number"

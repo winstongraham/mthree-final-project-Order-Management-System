@@ -1,30 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import api from '../api';
 
-export default function OrderList({ refreshFlag, limit }) {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function OrderList({ orders = [], limit }) {
   const [successMessage, setSuccessMessage] = useState('');
   const [editOrderId, setEditOrderId] = useState(null);
   const [editPrice, setEditPrice] = useState('');
   const [editQuantity, setEditQuantity] = useState('');
 
-  useEffect(() => {
-    fetchOrders();
-  }, [refreshFlag]);
-
-  const fetchOrders = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get('/orders');
-      setOrders(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch orders');
-      setLoading(false);
-    }
-  };
+  // Apply limit if provided
+  const displayedOrders = limit ? orders.slice(-limit) : orders;
 
   const startEdit = (order) => {
     setEditOrderId(order.id);
@@ -49,11 +33,10 @@ export default function OrderList({ refreshFlag, limit }) {
 
     try {
       await api.put(`/orders/${editOrderId}`, {
-        price: editPrice,
-        quantity: editQuantity,
+        price,
+        quantity,
       });
       cancelEdit();
-      fetchOrders();
       setSuccessMessage('Order updated successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
@@ -64,19 +47,12 @@ export default function OrderList({ refreshFlag, limit }) {
   const handleDelete = async (orderId) => {
     try {
       await api.delete(`/orders/${orderId}`);
-      await fetchOrders();
       setSuccessMessage('Order deleted successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Failed to delete order:', error);
     }
   };
-
-  if (loading) return <p>Loading orders...</p>;
-  if (error) return <p>{error}</p>;
-
-  // Apply limit if provided
-  const displayedOrders = limit ? orders.slice(-limit) : orders;
 
   return (
     <div>
