@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 
-export default function UserList() {
+export default function UserList({ usersRefreshFlag }) {
   const [users, setUsers] = useState([]);
   const [editUserId, setEditUserId] = useState(null);
   const [editEmail, setEditEmail] = useState('');
@@ -25,7 +25,7 @@ export default function UserList() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [usersRefreshFlag]);
 
   const startEdit = (user) => {
     setEditUserId(user.id);
@@ -91,7 +91,7 @@ export default function UserList() {
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
-                <td>{user.id}</td>
+                <td>#{user.id}</td>
                 <td>{user.username}</td>
                 <td>{user.full_name}</td>
                 {editUserId === user.id ? (

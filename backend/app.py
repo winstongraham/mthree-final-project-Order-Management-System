@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy 
+from sqlalchemy import or_
 from extensions import db
 import os
 
@@ -55,7 +56,7 @@ def get_orders():
             'price': order.price,
             'status': order.status,
             'user': {
-                'id': order.user.id,
+                'id': order.user.user_id,
                 'username': order.user.username
             } if order.user else None
         } for order in orders
@@ -125,6 +126,7 @@ def update_order(order_id):
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
+    users = User.query.filter()
 
     new_user = User(
         username=data['username'],
@@ -142,7 +144,7 @@ def get_users():
     users = User.query.all()
     return jsonify([
         {
-            'id': user.id,
+            'id': user.user_id,
             'username': user.username,
             'full_name': user.full_name,
             'email': user.email,

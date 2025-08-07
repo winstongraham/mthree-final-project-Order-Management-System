@@ -3,6 +3,7 @@ import OrderForm from './components/OrderForm';
 import OrderList from './components/OrderList';
 import OrderSearch from './components/OrderSearch';
 import UserList from './components/UserList';
+import UserForm from './components/UserForm';
 import api from './api';
 
 function App() {
@@ -18,7 +19,8 @@ function App() {
       const response = await api.get('/orders');
       setAllOrders(response.data);
       setFilteredOrders(response.data);
-    } catch {
+    } catch (err) {
+      console.log(err)
       alert('Failed to fetch orders');
     }
   };
@@ -49,6 +51,12 @@ function App() {
     refreshOrders();
   };
 
+  // Handler to refresh users after a new user is created
+  const [usersRefreshFlag, setUsersRefreshFlag] = useState(false);
+  const handleUserCreated = () => {
+    setUsersRefreshFlag(flag => !flag);
+  };
+
   return (
     <div className="App" style={{ padding: '20px', maxWidth: '900px', margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>Order Management System</h1>
@@ -66,14 +74,7 @@ function App() {
         <>
           {!viewAll ? (
             <>
-              {/* Wait to render form until user ID is ready */}
-              {/* {currentUserId ? (
-                <OrderForm onOrderCreated={handleOrderCreated} user_id={currentUserId} />
-              ) : (
-                <p>Loading user...</p>
-              )} */}
               <OrderForm onOrderCreated={handleOrderCreated} user_id={currentUserId} />
-
               <OrderList orders={filteredOrders} limit={5} refreshOrders={refreshOrders} />
               <button onClick={() => setViewAll(true)} style={{ marginTop: '20px' }}>
                 View All Orders
@@ -95,7 +96,12 @@ function App() {
         </>
       )}
 
-      {view === 'users' && <UserList />}
+      {view === 'users' && (
+        <>
+          <UserForm onUserCreated={handleUserCreated} />
+          <UserList usersRefreshFlag={usersRefreshFlag} />
+        </>
+      )}
     </div>
   );
 }
