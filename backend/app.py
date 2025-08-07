@@ -149,7 +149,7 @@ def get_users():
         } for user in users
     ])
 
-# Get one user by id
+# Get one user by ID
 @app.route('/users/<int:users_id>', methods=['GET'])
 def get_user(users_id):
     user = User.query.get(users_id)
@@ -158,41 +158,42 @@ def get_user(users_id):
     return jsonify(user.to_dict())
 
 
+# Delete user by ID
 @app.route('/users/<int:users_id>', methods=['DELETE'])
 def delete_user(users_id):
-    user = User.query.get(user_id)
+    user = User.query.get(users_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
     db.session.delete(user)
     db.session.commit()
-    return jsonify({"message": f"User {user_id} deleted"})
+    return jsonify({"message": f"User {users_id} deleted"}), 200
 
-@app.route('/user/<int:users_id>', methods=['PUT'])
+
+# Update user by ID
+@app.route('/users/<int:users_id>', methods=['PUT'])
 def update_user(users_id):
-    user = User.query.get(user_id)
+    user = User.query.get(users_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
 
     data = request.get_json()
 
-    # Update email or quantity 
+    if 'username' in data:
+        user.username = str(data['username'])
+
+    if 'full_name' in data:
+        user.full_name = str(data['full_name'])
 
     if 'email' in data:
         user.email = str(data['email'])
 
     if 'role' in data:
-       user.role = str(data['role'])
+        user.role = str(data['role'])
 
     db.session.commit()
 
-    return jsonify({
-        'id': user.id,
-        'username': user.username,
-        'full_name': user.full_name,
-        'email': user.email,
-        'role': user.role
-    }), 200
+    return jsonify(user.to_dict()), 200
 
 
 

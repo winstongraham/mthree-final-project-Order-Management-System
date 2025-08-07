@@ -30,6 +30,8 @@ export default function Order({ onOrderCreated }) {
                 quantity: Number(quantity),
                 price: Number(price),
                 side, 
+                status,
+                users_id
             });
             setLoading(false);
             onOrderCreated(response.data) // Notify parent
