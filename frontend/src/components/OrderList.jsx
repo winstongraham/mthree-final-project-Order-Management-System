@@ -61,7 +61,7 @@ export default function OrderList({ orders, limit, refreshOrders }) {
       <table
         border="1"
         cellPadding="8"
-        style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}
+        style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px', textAlign: 'center' }}
       >
         <thead>
           <tr>

@@ -50,7 +50,7 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ padding: '20px', maxWidth: '900px', margin: 'auto' }}>
+    <div className="App" style={{ padding: '20px', maxWidth: '900px', margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>Order Management System</h1>
 
       <div style={{ marginBottom: '20px' }}>
@@ -67,11 +67,12 @@ function App() {
           {!viewAll ? (
             <>
               {/* Wait to render form until user ID is ready */}
-              {currentUserId ? (
+              {/* {currentUserId ? (
                 <OrderForm onOrderCreated={handleOrderCreated} user_id={currentUserId} />
               ) : (
                 <p>Loading user...</p>
-              )}
+              )} */}
+              <OrderForm onOrderCreated={handleOrderCreated} user_id={currentUserId} />
 
               <OrderList orders={filteredOrders} limit={5} refreshOrders={refreshOrders} />
               <button onClick={() => setViewAll(true)} style={{ marginTop: '20px' }}>

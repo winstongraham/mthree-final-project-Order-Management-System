@@ -59,51 +59,54 @@ export default function OrderForm({ onOrderCreated, user_id }) {
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <h3>Create New Order</h3>
 
-      <div>
+      <div className="form-field">
         <label>Instrument: </label>
         <input
           type="text"
           value={instrument}
           onChange={(e) => setInstrument(e.target.value.toUpperCase())}
           placeholder="e.g. AAPL"
+          className='form-input'
         />
       </div>
 
-      <div>
+      <div className="form-field">
         <label>Quantity: </label>
         <input
           type="number"
           min="1"
           value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          onChange={(e) => setQuantity(Number(e.target.value))}
           placeholder="e.g. 10"
+          className='form-input'
         />
       </div>
 
-      <div>
+      <div className="form-field">
         <label>Price: </label>
         <input
           type="number"
           min="0.01"
           step="0.01"
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          onChange={(e) => setPrice(Number(e.target.value))}
           placeholder="e.g. 150.00"
+          className='form-input'
         />
       </div>
 
-      <div>
+      <div className="form-field">
         <label>Status: </label>
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className='form-input'>
           <option value="open">open</option>
           <option value="filled">filled</option>
           <option value="cancelled">cancelled</option>
         </select>
       </div>
 
-      <div>
+      <div className="form-field">
         <label>Side: </label>
-        <select value={side} onChange={(e) => setSide(e.target.value)}>
+        <select value={side} onChange={(e) => setSide(e.target.value)} className='form-input'>
           <option value="buy">Buy</option>
           <option value="sell">Sell</option>
         </select>

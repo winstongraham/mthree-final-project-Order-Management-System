@@ -23,8 +23,9 @@ def home():
 @app.route('/orders', methods=['POST'])
 def create_order():
     data = request.get_json()
+    print(data)
 
-    required_fields = ["instrument", "quantity", "price", "status", "side", "users_id"]
+    required_fields = ["instrument", "quantity", "price", "status", "side", "user_id"]
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400
@@ -35,7 +36,7 @@ def create_order():
         price=float(data['price']),
         side=data['side'],
         status=data['status'],  # you previously hardcoded 'open'
-        users_id=int(data['users_id'])  # Add this assuming Order model has users_id FK
+        user_id=int(data['user_id'])  # Add this assuming Order model has users_id FK
     )
 
     db.session.add(order)
@@ -206,7 +207,6 @@ def update_user(users_id):
 if __name__ == '__main__':
     # Create tables if they don't exist
     with app.app_context():
-        db.drop_all()
         db.create_all()
 
     app.run(debug=True)
