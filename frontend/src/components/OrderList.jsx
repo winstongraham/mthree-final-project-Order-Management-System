@@ -1,58 +1,57 @@
 import { useState } from 'react';
 import api from '../api';
 
-function OrderList({ orders, limit, refreshOrders }) {
+export default function OrderList({ orders, limit, refreshOrders }) {
   const [editOrderId, setEditOrderId] = useState(null);
   const [editStatus, setEditStatus] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editQuantity, setEditQuantity] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  const [price, setPrice] = useState('');
-  const [quantity, setQuantity] = useState('');
 
   const startEdit = (order) => {
     setEditOrderId(order.id);
     setEditStatus(order.status);
-    setPrice(order.price);
-    setQuantity(order.quantity);
+    setEditPrice(order.price);
+    setEditQuantity(order.quantity);
   };
 
   const cancelEdit = () => {
     setEditOrderId(null);
     setEditStatus('');
-    setPrice('');
-    setQuantity('');
+    setEditPrice('');
+    setEditQuantity('');
   };
 
   const submitEdit = async () => {
     try {
       await api.put(`/orders/${editOrderId}`, {
-        price,
-        quantity,
+        price: Number(editPrice),
+        quantity: Number(editQuantity),
         status: editStatus,
       });
-      cancelEdit();
       setSuccessMessage('Order updated successfully!');
-      refreshOrders(); // Trigger refetch
+      refreshOrders();
+      cancelEdit();
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Update failed:', err);
+      alert('Failed to update order');
     }
   };
 
   const handleDelete = async (orderId) => {
-  const confirmDelete = window.confirm("Are you sure you want to delete this order?");
-  if (!confirmDelete) return;
+    if (!window.confirm('Are you sure you want to delete this order?')) return;
 
-  try {
-    await api.delete(`/orders/${orderId}`);
-    setSuccessMessage('Order deleted successfully!');
-    refreshOrders(); // Trigger refetch
-    setTimeout(() => setSuccessMessage(''), 3000);
-  } catch (err) {
-    console.error('Delete failed:', err);
-  }
-};
-
+    try {
+      await api.delete(`/orders/${orderId}`);
+      setSuccessMessage('Order deleted successfully!');
+      refreshOrders();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Delete failed:', err);
+      alert('Failed to delete order');
+    }
+  };
 
   return (
     <div>
@@ -78,15 +77,14 @@ function OrderList({ orders, limit, refreshOrders }) {
           {(limit ? orders.slice(0, limit) : orders).map((order) => (
             <tr key={order.id}>
               <td>#{order.id}</td>
-
               <td>{order.instrument}</td>
               <td>
                 {editOrderId === order.id ? (
                   <input
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
                     type="number"
                     step="0.01"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
                   />
                 ) : (
                   order.price
@@ -95,9 +93,9 @@ function OrderList({ orders, limit, refreshOrders }) {
               <td>
                 {editOrderId === order.id ? (
                   <input
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
                     type="number"
+                    value={editQuantity}
+                    onChange={(e) => setEditQuantity(e.target.value)}
                   />
                 ) : (
                   order.quantity
@@ -126,12 +124,12 @@ function OrderList({ orders, limit, refreshOrders }) {
                 ) : (
                   <>
                     <button onClick={() => startEdit(order)}>Edit</button>
-                    <button onClick={() => handleDelete(order.id)}
-                     style={{ color: 'red', marginLeft: '10px' }}
+                    <button
+                      onClick={() => handleDelete(order.id)}
+                      style={{ color: 'red', marginLeft: '10px' }}
                     >
-                        Delete
+                      Delete
                     </button>
-                    
                   </>
                 )}
               </td>
@@ -142,5 +140,3 @@ function OrderList({ orders, limit, refreshOrders }) {
     </div>
   );
 }
-
-export default OrderList;

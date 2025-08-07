@@ -5,7 +5,7 @@ from extensions import db
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, origins=["http://localhost:5173"])  # Enable CORS for all routes
 
 # Simple SQLite DB setup (file named orders.db in project root)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///orders.db'
@@ -24,7 +24,7 @@ def home():
 def create_order():
     data = request.get_json()
 
-    required_fields = ["instrument", "quantity", "price", "status", "side"]
+    required_fields = ["instrument", "quantity", "price", "status", "side", "users_id"]
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400
@@ -34,14 +34,14 @@ def create_order():
         quantity=int(data['quantity']),
         price=float(data['price']),
         side=data['side'],
-        status='open'
+        status=data['status'],  # you previously hardcoded 'open'
+        users_id=int(data['users_id'])  # Add this assuming Order model has users_id FK
     )
 
     db.session.add(order)
     db.session.commit()
 
     return jsonify(order.to_dict()), 201
-
 @app.route('/orders', methods=['GET'])
 def get_orders():
     orders = Order.query.all()

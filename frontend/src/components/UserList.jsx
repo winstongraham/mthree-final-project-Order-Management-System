@@ -7,20 +7,25 @@ export default function UserList() {
   const [editEmail, setEditEmail] = useState('');
   const [editRole, setEditRole] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  // Fetch users on mount
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchUsers = async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await api.get('/users');
       setUsers(response.data);
     } catch {
-      alert('Failed to fetch users');
+      setError('Failed to fetch users');
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const startEdit = (user) => {
     setEditUserId(user.id);
@@ -41,9 +46,9 @@ export default function UserList() {
         role: editRole,
       });
       setSuccessMessage('User updated successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      fetchUsers();
       cancelEdit();
-      fetchUsers(); // refresh list
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch {
       alert('Failed to update user');
     }
@@ -54,8 +59,8 @@ export default function UserList() {
     try {
       await api.delete(`/users/${userId}`);
       setSuccessMessage('User deleted successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
       fetchUsers();
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch {
       alert('Failed to delete user');
     }
@@ -63,59 +68,75 @@ export default function UserList() {
 
   return (
     <div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-      <table border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.username}</td>
-              <td>{user.full_name}</td>
-              {editUserId === user.id ? (
-                <>
-                  <td>
-                    <input
-                      type="email"
-                      value={editEmail}
-                      onChange={e => setEditEmail(e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <select value={editRole} onChange={e => setEditRole(e.target.value)}>
-                      <option value="trader">Trader</option>
-                      <option value="admin">Admin</option>
-                      <option value="viewer">Viewer</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button onClick={submitEdit}>Save</button>
-                    <button onClick={cancelEdit} style={{ marginLeft: '5px' }}>Cancel</button>
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <button onClick={() => startEdit(user)}>Edit</button>
-                    <button onClick={() => handleDelete(user.id)} style={{ color: 'red', marginLeft: '10px' }}>Delete</button>
-                  </td>
-                </>
-              )}
+      {loading ? (
+        <p>Loading users...</p>
+      ) : (
+        <table
+          border="1"
+          cellPadding="8"
+          style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}
+        >
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.username}</td>
+                <td>{user.full_name}</td>
+                {editUserId === user.id ? (
+                  <>
+                    <td>
+                      <input
+                        type="email"
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                      />
+                    </td>
+                    <td>
+                      <select value={editRole} onChange={(e) => setEditRole(e.target.value)}>
+                        <option value="trader">Trader</option>
+                        <option value="admin">Admin</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                    </td>
+                    <td>
+                      <button onClick={submitEdit}>Save</button>
+                      <button onClick={cancelEdit} style={{ marginLeft: '5px' }}>
+                        Cancel
+                      </button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{user.email}</td>
+                    <td>{user.role}</td>
+                    <td>
+                      <button onClick={() => startEdit(user)}>Edit</button>
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        style={{ color: 'red', marginLeft: '10px' }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

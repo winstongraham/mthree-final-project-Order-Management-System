@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function OrderSearch({ setOrders, allOrders }) {
+export default function OrderSearch({ allOrders, setOrders }) {
   const [searchId, setSearchId] = useState('');
 
   const fetchAllOrders = () => {
@@ -8,7 +8,7 @@ export default function OrderSearch({ setOrders, allOrders }) {
   };
 
   const filterOrderById = () => {
-    if (!searchId) {
+    if (!searchId.trim()) {
       alert('Please enter an order ID to search.');
       return;
     }
@@ -22,13 +22,15 @@ export default function OrderSearch({ setOrders, allOrders }) {
   };
 
   return (
-    <div style={{ marginBottom: '10px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+    <div
+      style={{ marginBottom: '10px', display: 'flex', gap: '10px', alignItems: 'center' }}
+    >
       <button onClick={fetchAllOrders}>View All Orders</button>
       <input
         type="number"
         placeholder="Enter Order ID"
         value={searchId}
-        onChange={e => setSearchId(e.target.value)}
+        onChange={(e) => setSearchId(e.target.value)}
       />
       <button onClick={filterOrderById}>Search by ID</button>
     </div>

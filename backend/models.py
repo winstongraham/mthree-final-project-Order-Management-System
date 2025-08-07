@@ -24,7 +24,8 @@ class Order(db.Model):
             "price": self.price,
             "side": self.side,
             "status": self.status,
-            "timestamp": self.timestamp.isoformat()
+            "timestamp": self.timestamp.isoformat(),
+            "user_id": self.user_id
         }
 
 class User(db.Model):

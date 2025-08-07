@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import OrderForm from './components/OrderForm';
 import OrderList from './components/OrderList';
 import OrderSearch from './components/OrderSearch';
-import UserList from './components/UserList';  // Import new UserList component
+import UserList from './components/UserList';
 import api from './api';
 
 function App() {
@@ -10,6 +10,7 @@ function App() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [viewAll, setViewAll] = useState(false);
   const [view, setView] = useState('orders'); // 'orders' or 'users'
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   // Fetch all orders from backend and update states
   const refreshOrders = async () => {
@@ -22,14 +23,28 @@ function App() {
     }
   };
 
-  // On mount, fetch orders initially
+  // Fetch users once on mount, set currentUserId to first user id
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await api.get('/users');
+        if (res.data.length > 0) {
+          setCurrentUserId(res.data[0].id);
+        }
+      } catch {
+        alert('Failed to fetch users');
+      }
+    }
+    fetchUsers();
+  }, []);
+
+  // Fetch orders on mount and whenever view switches to 'orders'
   useEffect(() => {
     if (view === 'orders') {
       refreshOrders();
     }
   }, [view]);
 
-  // When order created, refresh orders
   const handleOrderCreated = () => {
     refreshOrders();
   };
@@ -51,7 +66,13 @@ function App() {
         <>
           {!viewAll ? (
             <>
-              <OrderForm onOrderCreated={handleOrderCreated} />
+              {/* Wait to render form until user ID is ready */}
+              {currentUserId ? (
+                <OrderForm onOrderCreated={handleOrderCreated} user_id={currentUserId} />
+              ) : (
+                <p>Loading user...</p>
+              )}
+
               <OrderList orders={filteredOrders} limit={5} refreshOrders={refreshOrders} />
               <button onClick={() => setViewAll(true)} style={{ marginTop: '20px' }}>
                 View All Orders

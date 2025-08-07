@@ -5,31 +5,36 @@ export default function UserForm({ onUserCreated }) {
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('trader'); // default role
+  const [role, setRole] = useState('trader');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
-    // Basic validation
     if (!username || !fullName || !email || !role) {
       setError('All fields are required');
       return;
     }
 
+    setLoading(true);
     try {
       await api.post('/users', { username, full_name: fullName, email, role });
-      setError('');
+      setSuccess('User created successfully!');
       setUsername('');
       setFullName('');
       setEmail('');
       setRole('trader');
-      if (onUserCreated) {
-        onUserCreated();
-      }
+      onUserCreated();
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to create user');
-      console.error(err);
+      console.error(err.response || err.message || err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,6 +42,8 @@ export default function UserForm({ onUserCreated }) {
     <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
       <h3>Create New User</h3>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
+
       <div>
         <label>
           Username:{' '}
@@ -48,6 +55,7 @@ export default function UserForm({ onUserCreated }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           Full Name:{' '}
@@ -59,6 +67,7 @@ export default function UserForm({ onUserCreated }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           Email:{' '}
@@ -70,6 +79,7 @@ export default function UserForm({ onUserCreated }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           Role:{' '}
@@ -80,8 +90,9 @@ export default function UserForm({ onUserCreated }) {
           </select>
         </label>
       </div>
-      <button type="submit" style={{ marginTop: '10px' }}>
-        Create User
+
+      <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
+        {loading ? 'Submitting...' : 'Create User'}
       </button>
     </form>
   );
