@@ -14,7 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)  # initialize db with app
 
 # Import models after initializing db
-from models import Order
+from models import Order, User
 
 @app.route('/')
 def home():
@@ -24,7 +24,7 @@ def home():
 def create_order():
     data = request.get_json()
 
-    required_fields = ["instrument", "quantity", "price", "side"]
+    required_fields = ["instrument", "quantity", "price", "status", "side"]
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400
@@ -45,7 +45,21 @@ def create_order():
 @app.route('/orders', methods=['GET'])
 def get_orders():
     orders = Order.query.all()
-    return jsonify([order.to_dict() for order in orders])
+    return jsonify([
+        {
+            'id': order.id,
+            'instrument': order.instrument,
+            'side': order.side,
+            'quantity': order.quantity,
+            'price': order.price,
+            'status': order.status,
+            'user': {
+                'id': order.user.id,
+                'username': order.user.username
+            } if order.user else None
+        } for order in orders
+    ])
+
 
 @app.route('/orders/<int:order_id>', methods=['GET'])
 def get_order(order_id):
@@ -104,9 +118,94 @@ def update_order(order_id):
         "timestamp": order.timestamp.isoformat()
     }), 200
 
+## Users Routes start below ##
+
+# Create a new user
+@app.route('/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+
+    new_user = User(
+        username=data['username'],
+        full_name=data['full_name'],
+        email=data['email'],
+        role=data['role']
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify(new_user.to_dict()), 201
+
+# Get all users
+@app.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([
+        {
+            'id': user.id,
+            'username': user.username,
+            'full_name': user.full_name,
+            'email': user.email,
+            'role': user.role
+        } for user in users
+    ])
+
+# Get one user by id
+@app.route('/users/<int:users_id>', methods=['GET'])
+def get_user(users_id):
+    user = User.query.get(users_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify(user.to_dict())
+
+
+@app.route('/users/<int:users_id>', methods=['DELETE'])
+def delete_user(users_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"message": f"User {user_id} deleted"})
+
+@app.route('/user/<int:users_id>', methods=['PUT'])
+def update_user(users_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+
+    # Update email or quantity 
+
+    if 'email' in data:
+        user.email = str(data['email'])
+
+    if 'role' in data:
+       user.role = str(data['role'])
+
+    db.session.commit()
+
+    return jsonify({
+        'id': user.id,
+        'username': user.username,
+        'full_name': user.full_name,
+        'email': user.email,
+        'role': user.role
+    }), 200
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     # Create tables if they don't exist
     with app.app_context():
+        db.drop_all()
         db.create_all()
 
     app.run(debug=True)
