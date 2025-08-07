@@ -126,7 +126,14 @@ def update_order(order_id):
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
-    users = User.query.filter()
+    user = User.query.filter(
+        or_(
+            User.username == data['username'], 
+            User.email == data['email']
+        )
+    ).first()
+    if user: 
+        return jsonify({"error": "User with Username or Email already exists"}), 409
 
     new_user = User(
         username=data['username'],

@@ -56,7 +56,7 @@ export default function OrderForm({ onOrderCreated, user_id }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
+    <form onSubmit={handleSubmit} style={{ marginBottom: '20px', textAlign: "center" }}>
       <h3>Create New Order</h3>
 
       <div className="form-field">
@@ -115,7 +115,7 @@ export default function OrderForm({ onOrderCreated, user_id }) {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {success && <p style={{ color: 'green' }}>{success}</p>}
 
-      <button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading} style={{ marginTop: '20px' }}>
         {loading ? 'Submitting...' : 'Submit Order'}
       </button>
     </form>
