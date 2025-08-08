@@ -4,22 +4,22 @@
   font-weight: 400;
 
   color-scheme: light;
-  color: #34495e; /* Blue-gray for text */
-  background-color: #f0f4f8; /* Light blue-gray background */
+  color: #234567; /* Dark blue for text */
+  background-color: #e3f2fd; /* Pale blue background */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --primary-bg: #f0f4f8; /* Blue-gray */
-  --primary-color: #34495e; /* Blue-gray */
-  --accent-color: #a5d6a7; /* Pale green accent */
+  --primary-bg: #e3f2fd; /* Pale blue */
+  --primary-color: #234567; /* Dark blue */
+  --accent-color: #90caf9; /* Lighter blue accent */
   --link-color: #1976d2;
   --link-hover: #1565c0;
-  --button-bg: #b2dfdb; /* Pale green button */
-  --button-hover: #a5d6a7; /* Slightly brighter pale green */
-  --button-border: #388e3c; /* Green border */
+  --button-bg: #bbdefb;
+  --button-hover: #90caf9;
+  --button-border: #1976d2;
 }
 
 #root {
@@ -54,7 +54,7 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1.5px solid var(--button-border);
+  border: 1px solid var(--button-border);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
@@ -66,7 +66,7 @@ button {
 }
 button:hover {
   background-color: var(--button-hover);
-  border-color: var(--accent-color);
+  border-color: var(--link-hover);
 }
 button:focus,
 button:focus-visible {
@@ -80,8 +80,8 @@ button:focus-visible {
 
 .form-input {
   flex: 1;
-  background: #f8f9fa;
-  border: 1.5px solid var(--accent-color);
+  background: #fff;
+  border: 1px solid var(--accent-color);
   border-radius: 4px;
   padding: 0.5em;
   color: var(--primary-color);
@@ -90,16 +90,16 @@ button:focus-visible {
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    color: #f0f4f8;
-    background-color: #34495e;
-    --primary-bg: #34495e;
-    --primary-color: #f0f4f8;
-    --accent-color: #81c784;
+    color: #e3f2fd;
+    background-color: #234567;
+    --primary-bg: #234567;
+    --primary-color: #e3f2fd;
+    --accent-color: #1976d2;
     --link-color: #90caf9;
     --link-hover: #bbdefb;
-    --button-bg: #388e3c;
-    --button-hover: #81c784;
-    --button-border: #a5d6a7;
+    --button-bg: #1976d2;
+    --button-hover: #1565c0;
+    --button-border: #90caf9;
   }
   body {
     background: var(--primary-bg);
@@ -109,8 +109,8 @@ button:focus-visible {
     color: var(--primary-color);
   }
   .form-input {
-    background: #263238;
+    background: #1a237e;
     color: var(--primary-color);
-    border: 1.5px solid var(--accent-color);
+    border: 1px solid var(--accent-color);
   }
 }
